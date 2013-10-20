@@ -19,12 +19,12 @@ module Pocket
 
     # Return an access token from authorization
     def get_access_token(code, options={})
-      params = access_token_params.merge(options)
-
-      params = access_token_params.merge(:code => code).merge(options)
-      response = connection.post 'oauth/authorize', params
-      results = Hash[URI.decode_www_form(response.body)]
+      results = authorize_request(code, options)
       access_token = results['access_token']
+    end
+
+    def get_access_token_and_username(code, options={})
+      return authorize_request(code, options)
     end
 
     private
@@ -34,5 +34,12 @@ module Pocket
         :consumer_key => consumer_key
       }
     end
+
+    def authorize_request(code, options)
+      params = access_token_params.merge(:code => code).merge(options)
+      response = connection.post 'oauth/authorize', params
+      return Hash[URI.decode_www_form(response.body)]
+    end
   end
 end
+
